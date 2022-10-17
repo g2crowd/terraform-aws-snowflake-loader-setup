@@ -1,4 +1,4 @@
-resource "snowflake_role" "loader" {
+data "snowflake_role" "loader" {
   name = local.snowflake_loader_role
 }
 
@@ -6,14 +6,14 @@ resource "snowflake_warehouse_grant" "loader" {
   for_each          = toset(["MONITOR", "USAGE", "OPERATE"])
   warehouse_name    = snowflake_warehouse.loader.name
   privilege         = each.key
-  roles             = [snowflake_role.loader.name]
+  roles             = [data.snowflake_role.loader.name]
   with_grant_option = false
 }
 
 resource "snowflake_database_grant" "loader" {
   database_name     = var.snowflake_database
   privilege         = "USAGE"
-  roles             = [snowflake_role.loader.name]
+  roles             = [data.snowflake_role.loader.name]
   with_grant_option = false
 }
 
@@ -22,14 +22,14 @@ resource "snowflake_file_format_grant" "loader" {
   schema_name       = var.snowflake_schema
   file_format_name  = var.snowflake_file_format
   privilege         = "USAGE"
-  roles             = [snowflake_role.loader.name]
+  roles             = [data.snowflake_role.loader.name]
   with_grant_option = false
 }
 
 resource "snowflake_integration_grant" "loader" {
   integration_name  = snowflake_storage_integration.integration.name
   privilege         = "USAGE"
-  roles             = [snowflake_role.loader.name]
+  roles             = [data.snowflake_role.loader.name]
   with_grant_option = false
 }
 
@@ -38,7 +38,7 @@ resource "snowflake_stage_grant" "transformed" {
   schema_name       = var.snowflake_schema
   stage_name        = snowflake_stage.transformed.name
   privilege         = "USAGE"
-  roles             = [snowflake_role.loader.name]
+  roles             = [data.snowflake_role.loader.name]
   with_grant_option = false
 }
 
@@ -48,7 +48,7 @@ resource "snowflake_stage_grant" "folder_monitoring" {
   schema_name       = var.snowflake_schema
   stage_name        = each.value
   privilege         = "USAGE"
-  roles             = [snowflake_role.loader.name]
+  roles             = [data.snowflake_role.loader.name]
   with_grant_option = false
 }
 
@@ -62,7 +62,7 @@ resource "snowflake_schema_grant" "loader" {
   database_name     = var.snowflake_database
   schema_name       = var.snowflake_schema
   privilege         = each.key
-  roles             = [snowflake_role.loader.name]
+  roles             = [data.snowflake_role.loader.name]
   with_grant_option = false
 }
 
@@ -76,11 +76,11 @@ resource "snowflake_table_grant" "loader" {
   schema_name       = var.snowflake_schema
   table_name        = var.snowflake_event_table
   privilege         = each.key
-  roles             = [snowflake_role.loader.name]
+  roles             = [data.snowflake_role.loader.name]
   with_grant_option = false
 }
 
 resource "snowflake_role_grants" "loader" {
-  role_name = snowflake_role.loader.name
+  role_name = data.snowflake_role.loader.name
   users     = [var.snowflake_user]
 }
